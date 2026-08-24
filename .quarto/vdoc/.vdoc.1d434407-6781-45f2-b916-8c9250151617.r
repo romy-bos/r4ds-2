@@ -1,18 +1,18 @@
----
-title: "Analyzing US Births and Basketball Recruits"
-format: html
-execute:
-  echo: false
-author: Romy Bos
----
-
-```{r}
+#
+#
+#
+#
+#
+#
+#
+#
+#
 #| message: false
 library(tidyverse)
 library(readxl)
-```
-
-```{r}
+#
+#
+#
 births <- read_excel("data/us_births_1994_2014.xlsx")
 
 tibble(
@@ -23,13 +23,13 @@ tibble(
     \(column) paste(head(column, 3), collapse = ", ")
   )
 )
-```
-
-```{r}
+#
+#
+#
 summary(select(births, births, year))
-```
-
-```{r}
+#
+#
+#
 #| cache: true
 births_tibble <- births |>
   mutate(
@@ -39,9 +39,9 @@ births_tibble <- births |>
       ordered = TRUE
     )
   )
-```
-
-```{r}
+#
+#
+#
 births_by_calendar_position <- births |>
   group_by(month, date_of_month) |>
   summarise(
@@ -62,9 +62,9 @@ births_by_calendar_position |>
   scale_fill_viridis_c(name = "Mean births") +
   labs(x = "Day of month", y = NULL) +
   theme_minimal()
-```
-
-```{r}
+#
+#
+#
 christmas_data <- births |>
   filter(month == 12, date_of_month %in% c(20:24, 25, 27:30)) |>
   group_by(year) |>
@@ -78,13 +78,13 @@ christmas_data <- births |>
   )
 
 christmas_data
-```
-
-```{r}
+#
+#
+#
 summary(christmas_data)
-```
-
-```{r}
+#
+#
+#
 ggplot(christmas_data, aes(x = year, y = pct_of_baseline)) +
   geom_line() +
   geom_point(aes(color = christmas_weekday)) +
@@ -93,9 +93,9 @@ ggplot(christmas_data, aes(x = year, y = pct_of_baseline)) +
     y = "December 25 births (% of baseline)"
   ) +
   theme_minimal()
-```
-
-```{r}
+#
+#
+#
 nba_recruits <- read_excel("data/nba_recruits.xlsx")
 
 tibble(
@@ -106,10 +106,9 @@ tibble(
     \(column) paste(head(column, 3), collapse = ", ")
   )
 )
-```
-
-```{r}
-#| cache: true
+#
+#
+#
 basketball_tibble <- nba_recruits |>
   mutate(
     tier = factor(
@@ -122,22 +121,11 @@ basketball_tibble <- nba_recruits |>
         "Superstar"
       ),
       ordered = TRUE
-    ),
-    recruit_group = factor(
-      recruit_group,
-      levels = c(
-        "#1–10",
-        "#11–25",
-        "#26–50",
-        "#51–100",
-        "Outside top 100"
-      ),
-      ordered = TRUE
     )
   )
-```
-
-```{r}
+#
+#
+#
 summary(select(
   nba_recruits,
   rank,
@@ -146,84 +134,29 @@ summary(select(
   total_seasons,
   drafted
 ))
-```
-
-```{r}
+#
+#
+#
 count(basketball_tibble, tier)
-```
-
-```{r}
-count(basketball_tibble, recruit_group)
-```
-
-```{r}
-notable_players <- basketball_tibble |>
-  filter(!is.na(rank), !is.na(top_mean_wa)) |>
-  slice_max(top_mean_wa, n = 4, with_ties = FALSE) |>
-  mutate(
-    label_x = c(8, 13, 10, 13),
-    label_y = c(25.7, 19.4, 19.2, 16.2)
-  )
-
-basketball_tibble |>
-  filter(!is.na(rank), !is.na(top_mean_wa)) |>
-  ggplot(aes(x = rank, y = top_mean_wa, color = tier)) +
-  geom_point() +
-  geom_smooth(
-    aes(group = 1),
-    method = "lm",
-    formula = y ~ x,
-    se = FALSE,
-    color = "black"
-  ) +
-  geom_segment(
-    data = notable_players,
-    aes(xend = label_x, yend = label_y),
-    linewidth = 0.3,
-    show.legend = FALSE
-  ) +
-  geom_label(
-    data = notable_players,
-    aes(x = label_x, y = label_y, label = name),
-    fill = "white",
-    label.size = 0.2,
-    size = 3,
-    show.legend = FALSE
-  ) +
-  scale_color_viridis_d(end = 0.9) +
-  scale_y_continuous(expand = expansion(mult = c(0.03, 0.12))) +
-  labs(
-    title = "Peak Wins Added declines with recruit rank",
-    subtitle = "Career performance among recruited players",
-    x = "Recruit rank",
-    y = "Peak Wins Added",
-    color = "Career tier"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(face = "bold"),
-    legend.position = "bottom",
-    panel.grid.minor = element_blank()
-  )
-```
-
-```{r}
+#
+#
+#
 births_model <- lm(
   births ~ year + month + day_of_week,
   data = births_tibble
 )
 
 summary(births_model)$r.squared
-```
-
-```{r}
+#
+#
+#
 births_adjusted <- births_tibble |>
   mutate(pct_resid = 100 * residuals(births_model) / mean(births))
 
 str(births_adjusted)
-```
-
-```{r}
+#
+#
+#
 calendar_resid <- births_adjusted |>
   filter(!(month == 2 & date_of_month == 29)) |>
   group_by(month, date_of_month) |>
@@ -237,9 +170,9 @@ calendar_resid <- births_adjusted |>
   arrange(calendar_date)
 
 calendar_resid
-```
-
-```{r}
+#
+#
+#
 holiday_dates <- tibble(
   calendar_date = as.Date(c("2001-01-01", "2001-07-04", "2001-11-22", "2001-12-25")),
   holiday = c(
@@ -265,5 +198,8 @@ calendar_resid |>
     y = "Mean residual (% of overall mean birth count)"
   ) +
   theme_minimal()
-```
-
+#
+#
+#
+#
+#
